@@ -2,1370 +2,875 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#080808">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SpiderBot Controller</title>
 
 <style>
-:root{
-    --bg:#080909;
-    --panel:#111313;
-    --panel2:#191b1b;
-    --red:#ff2028;
-    --red-dark:#9d1015;
-    --white:#f5f5f5;
-    --muted:#777;
-    --border:#303333;
-    --green:#25df88;
+:root {
+    --bg:#0b0d10;
+    --panel:#15191f;
+    --panel2:#1b2028;
+    --line:#2a3039;
+    --red:#ef4444;
+    --red2:#b91c1c;
+    --text:#e9edf2;
+    --muted:#9aa4b2;
+    --green:#36c98a;
 }
 
-*{
+* {
     box-sizing:border-box;
+}
+
+body {
     margin:0;
-    padding:0;
-    -webkit-tap-highlight-color:transparent;
-}
-
-body{
     background:var(--bg);
-    color:var(--white);
-    font-family:Arial,Helvetica,sans-serif;
+    color:var(--text);
+    font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     min-height:100vh;
-    overflow:hidden;
 }
 
-/* ================= MAIN LAYOUT ================= */
-
-.app{
-    width:100%;
-    height:100dvh;
-    padding:12px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    background:
-        radial-gradient(circle at 50% 50%,#151616 0%,#090a0a 65%);
-}
-
-.topbar{
-    height:65px;
-    min-height:65px;
+header {
+    height:68px;
+    border-bottom:1px solid var(--line);
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 18px;
-    border:1px solid #292c2c;
-    border-radius:15px;
-    background:linear-gradient(180,#151717,#0c0d0d);
+    padding:0 24px;
+    background:#101318;
 }
 
-.brand{
+.brand {
     display:flex;
     align-items:center;
     gap:12px;
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.5px;
 }
 
-.logo{
-    color:var(--red);
-    font-size:32px;
-}
-
-.brand-name{
-    font-size:24px;
-    font-weight:900;
-    letter-spacing:1px;
-}
-
-.brand-name span{
-    color:var(--red);
-}
-
-.brand-sub{
-    font-size:9px;
-    color:#777;
-    letter-spacing:3px;
-    margin-top:3px;
-}
-
-.top-right{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.connection{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    background:#202222;
-    border:1px solid #353838;
-    padding:9px 12px;
-    border-radius:10px;
-    font-size:12px;
-    color:#aaa;
-}
-
-.dot{
-    width:9px;
-    height:9px;
-    border-radius:50%;
-    background:#777;
-}
-
-.dot.connected{
-    background:var(--green);
-    box-shadow:0 0 10px #25df8866;
-}
-
-button{
-    color:white;
-    font-family:inherit;
-    font-weight:700;
-    background:#1c1e1e;
-    border:1px solid #353838;
+.logo {
+    width:38px;
+    height:38px;
     border-radius:12px;
+    background:linear-gradient(145deg,#ef4444,#851d24);
+    display:grid;
+    place-items:center;
+    font-size:21px;
+}
+
+.sub {
+    font-size:11px;
+    color:var(--muted);
+    font-weight:600;
+    letter-spacing:1.5px;
+}
+
+button {
+    font:inherit;
     cursor:pointer;
-    transition:0.12s;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--panel2);
+    color:var(--text);
+    transition:.15s;
+    touch-action:none;
     user-select:none;
     -webkit-user-select:none;
-    touch-action:manipulation;
 }
 
-button:active{
-    transform:scale(.96);
-    filter:brightness(1.3);
+button:hover {
+    filter:brightness(1.2);
+    transform:translateY(-1px);
 }
 
-.connect-btn{
-    background:var(--red);
-    border:none;
-    padding:10px 20px;
-    font-size:12px;
-    border-radius:10px;
-}
-
-.icon-btn{
-    width:43px;
-    height:43px;
-    font-size:20px;
-    background:#181a1a;
-}
-
-/* ================= CONTENT ================= */
-
-.main{
-    flex:1;
-    min-height:0;
-    display:grid;
-    grid-template-columns:210px minmax(0,1fr) 220px;
-    gap:12px;
-}
-
-/* ================= LEFT PANEL ================= */
-
-.left-panel{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.panel{
-    background:linear-gradient(145deg,#151717,#0e1010);
-    border:1px solid var(--border);
-    border-radius:16px;
-}
-
-.movement-panel{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:10px;
-}
-
-.panel-title{
-    font-size:10px;
-    color:#888;
-    letter-spacing:2px;
-    font-weight:800;
-    text-align:center;
-}
-
-/* ================= DIAMOND CONTROL ================= */
-
-.dpad{
-    width:min(100%,190px);
-    aspect-ratio:1/1;
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    grid-template-rows:1fr 1fr 1fr;
-    gap:7px;
-    margin:auto;
-}
-
-.dpad button{
-    background:linear-gradient(145deg,#252828,#111313);
-    border:1px solid #3a3d3d;
-    border-radius:13px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    gap:3px;
-}
-
-.dpad button:active,
-.dpad button.active{
-    background:linear-gradient(145deg,#e31a21,#851116);
-    border-color:#ff4a4f;
-    box-shadow:0 0 16px #ff202833;
-}
-
-.arrow{
-    font-size:26px;
-    font-weight:900;
-    line-height:1;
-}
-
-.direction-label{
-    font-size:8px;
-    letter-spacing:1px;
-    color:#aaa;
-}
-
-.dpad .empty{
-    visibility:hidden;
-    pointer-events:none;
-}
-
-.forward{
-    grid-column:2;
-    grid-row:1;
-}
-
-.left{
-    grid-column:1;
-    grid-row:2;
-}
-
-.right{
-    grid-column:3;
-    grid-row:2;
-}
-
-.backward{
-    grid-column:2;
-    grid-row:3;
-}
-
-/* ================= SPEED ================= */
-
-.speed-panel{
-    padding:13px;
-}
-
-.speed-heading{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    font-size:12px;
-    font-weight:800;
-    margin-bottom:10px;
-}
-
-.speed-number{
-    color:var(--red);
-    font-size:15px;
-}
-
-.speed-slider{
-    width:100%;
-    accent-color:var(--red);
-    cursor:pointer;
-}
-
-.speed-labels{
-    display:flex;
-    justify-content:space-between;
-    color:#666;
-    font-size:9px;
-    margin-top:5px;
-}
-
-/* ================= CAMERA ================= */
-
-.camera-panel{
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-    overflow:hidden;
-    border:1px solid #383b3b;
-    border-radius:17px;
-    background:#050606;
-    position:relative;
-}
-
-.camera-header{
-    height:43px;
-    min-height:43px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 13px;
-    background:#121414;
-    border-bottom:1px solid #292c2c;
-}
-
-.camera-title{
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:1.5px;
-    display:flex;
-    gap:8px;
-    align-items:center;
-}
-
-.live-indicator{
-    display:flex;
-    gap:6px;
-    align-items:center;
-    font-size:10px;
-    color:#777;
-}
-
-.live-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:#555;
-}
-
-.camera-body{
-    flex:1;
-    position:relative;
-    min-height:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:
-        radial-gradient(circle at center,#111515 0%,#070808 75%);
-    overflow:hidden;
-}
-
-/* Camera placeholder: stream will be added later */
-
-.camera-placeholder{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-    color:#3c4141;
-    text-align:center;
-}
-
-.camera-icon{
-    font-size:52px;
-    opacity:.4;
-}
-
-.camera-placeholder h3{
-    font-size:12px;
-    letter-spacing:3px;
-    color:#555;
-}
-
-.camera-placeholder p{
-    font-size:10px;
-    color:#3e4444;
-}
-
-.camera-grid{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    opacity:.08;
-    background-image:
-        linear-gradient(to right,#888 1px,transparent 1px),
-        linear-gradient(to bottom,#888 1px,transparent 1px);
-    background-size:40px 40px;
-}
-
-.camera-footer{
-    height:35px;
-    min-height:35px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 12px;
-    background:#111313;
-    border-top:1px solid #282b2b;
-    font-size:9px;
-    color:#777;
-    letter-spacing:1px;
-}
-
-/* ================= RIGHT PANEL ================= */
-
-.right-panel{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.action-panel{
-    flex:1;
-    padding:12px;
-    display:flex;
-    flex-direction:column;
-}
-
-.action-title{
-    margin-bottom:12px;
-}
-
-.action-grid{
-    flex:1;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-template-rows:repeat(3,1fr);
-    gap:8px;
-}
-
-.action-btn{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    background:linear-gradient(145deg,#202222,#131515);
-    border:1px solid #353838;
-    border-radius:13px;
-}
-
-.action-btn:active{
-    background:#481719;
-    border-color:var(--red);
-}
-
-.action-icon{
-    font-size:23px;
-    color:var(--red);
-}
-
-.action-name{
-    font-size:10px;
-    letter-spacing:1px;
-}
-
-/* ================= SERVO ================= */
-
-.servo-btn{
-    min-height:50px;
-    color:#ff4148;
-    border:1px solid #7c191d;
-    background:linear-gradient(145deg,#281617,#171111);
-    font-size:11px;
-    letter-spacing:1px;
-}
-
-/* ================= STOP ================= */
-
-.stop-btn{
-    min-height:65px;
-    background:linear-gradient(145deg,#ff292f,#a50910);
-    border:none;
-    border-radius:15px;
-    font-size:20px;
-    font-weight:900;
-    letter-spacing:2px;
-    box-shadow:0 0 15px #ff202822;
-}
-
-.stop-btn:active{
-    background:#800a10;
+button:active {
     transform:scale(.97);
 }
 
-/* ================= CONFIG MODAL ================= */
+.connect {
+    padding:10px 16px;
+    border-color:#3d454f;
+}
 
-.modal{
-    position:fixed;
-    inset:0;
-    background:#000b;
-    z-index:100;
-    display:none;
+.connect.connected {
+    border-color:var(--green);
+    color:var(--green);
+}
+
+main {
+    padding:18px;
+    max-width:1500px;
+    margin:auto;
+}
+
+.layout {
+    display:grid;
+    grid-template-columns:250px minmax(360px,1fr) 250px;
+    gap:16px;
+    align-items:stretch;
+}
+
+.panel {
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+}
+
+.panel-title {
+    font-size:12px;
+    color:var(--muted);
+    font-weight:800;
+    letter-spacing:1.4px;
+    margin:0 0 14px;
+}
+
+.movement {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:9px;
+}
+
+.padrow {
+    display:flex;
+    gap:9px;
+    align-items:center;
+}
+
+.dir {
+    width:58px;
+    height:54px;
+    font-size:21px;
+    font-weight:700;
+}
+
+.dir:active,
+.action:active {
+    background:#313944;
+}
+
+.empty {
+    width:58px;
+    height:54px;
+}
+
+.speedbox {
+    margin-top:22px;
+}
+
+.speedhead {
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.speedhead strong {
+    color:var(--text);
+}
+
+input[type=range] {
+    width:100%;
+    accent-color:var(--red);
+}
+
+.speedticks {
+    display:flex;
+    justify-content:space-between;
+    color:#687383;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.camera {
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    min-height:410px;
+}
+
+.camhead {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:4px 4px 12px;
+}
+
+.livebadge {
+    font-size:11px;
+    color:var(--muted);
+    display:flex;
+    gap:7px;
+    align-items:center;
+}
+
+.dot {
+    width:7px;
+    height:7px;
+    background:#59616d;
+    border-radius:50%;
+}
+
+.screen {
+    flex:1;
+    min-height:300px;
+    border-radius:12px;
+    background:#080a0c;
+    border:1px solid #232931;
+    display:flex;
     align-items:center;
     justify-content:center;
-    padding:20px;
+    text-align:center;
+    overflow:hidden;
+    position:relative;
 }
 
-.modal.show{
-    display:flex;
-}
-
-.modal-box{
-    width:min(420px,100%);
-    background:#161818;
-    border:1px solid #393d3d;
-    border-radius:18px;
-    padding:20px;
-}
-
-.modal-title{
-    font-size:16px;
-    font-weight:900;
-    margin-bottom:18px;
-}
-
-.config-label{
-    font-size:11px;
-    color:#999;
-    margin-bottom:7px;
-    display:block;
-}
-
-.config-input{
+.screen img {
     width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #383c3c;
-    background:#090b0b;
-    color:white;
-    margin-bottom:14px;
-    outline:none;
+    height:100%;
+    object-fit:contain;
+    display:none;
 }
 
-.config-input:focus{
-    border-color:var(--red);
+.placeholder {
+    color:#606b79;
 }
 
-.modal-buttons{
+.camicon {
+    font-size:38px;
+    margin-bottom:10px;
+    opacity:.7;
+}
+
+.placeholder p {
+    font-size:13px;
+    margin:4px;
+}
+
+.camfoot {
     display:flex;
-    gap:10px;
+    justify-content:space-between;
+    color:#788493;
+    font-size:11px;
+    padding:10px 2px 0;
 }
 
-.modal-buttons button{
-    flex:1;
-    padding:12px;
+.actions {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
 }
 
-.save-btn{
-    background:var(--red);
+.action {
+    padding:12px 8px;
+    min-height:52px;
+    font-size:13px;
+    font-weight:650;
+}
+
+.action .emoji {
+    display:block;
+    font-size:18px;
+    margin-bottom:4px;
+}
+
+.wide {
+    grid-column:1/-1;
+}
+
+.servo {
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    font-size:12px;
+    color:#c3cbd5;
+}
+
+.stop {
+    width:100%;
+    background:linear-gradient(145deg,#ef4444,#b91c1c);
     border:none;
+    border-radius:15px;
+    padding:18px;
+    margin-top:14px;
+    font-size:18px;
+    font-weight:900;
+    letter-spacing:1px;
+    box-shadow:0 7px 25px #b91c1c33;
 }
 
-/* ================= RESPONSIVE ================= */
+.stop small {
+    display:block;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:1.2px;
+    margin-top:4px;
+}
 
-@media (orientation:portrait){
+.statusline {
+    color:var(--muted);
+    font-size:12px;
+    margin-top:12px;
+    text-align:center;
+    min-height:16px;
+}
 
-    body{
-        overflow:auto;
+.modal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#000a;
+    z-index:5;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+}
+
+.modal.open {
+    display:flex;
+}
+
+.modalbox {
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:20px;
+    width:min(420px,100%);
+}
+
+.modalbox h2 {
+    margin:0 0 18px;
+    font-size:18px;
+}
+
+.field {
+    margin:14px 0;
+}
+
+.field label {
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:7px;
+}
+
+.field input {
+    width:100%;
+    padding:11px;
+    border:1px solid var(--line);
+    background:#0e1115;
+    border-radius:9px;
+    color:var(--text);
+}
+
+.field small {
+    color:#687483;
+}
+
+.modalbuttons {
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:18px;
+}
+
+.modalbuttons button {
+    padding:10px 14px;
+}
+
+.save {
+    background:var(--red2);
+    border-color:var(--red2);
+}
+
+@media(max-width:950px) {
+    .layout {
+        grid-template-columns:220px 1fr;
     }
 
-    .app{
-        height:auto;
-        min-height:100dvh;
+    .right {
+        grid-column:1/-1;
     }
 
-    .main{
-        grid-template-columns:1fr;
-    }
-
-    .camera-panel{
-        order:1;
-        min-height:300px;
-    }
-
-    .left-panel{
-        order:2;
-        display:grid;
-        grid-template-columns:1fr 1fr;
-    }
-
-    .movement-panel{
-        min-height:230px;
-    }
-
-    .dpad{
-        width:180px;
-    }
-
-    .right-panel{
-        order:3;
-    }
-
-    .action-panel{
-        min-height:220px;
-    }
-
-    .action-grid{
-        grid-template-rows:repeat(2,85px);
-    }
-
-    .stop-btn{
-        min-height:65px;
+    .actions {
+        grid-template-columns:repeat(3,1fr);
     }
 }
 
-@media (max-height:500px) and (orientation:landscape){
-
-    .app{
-        padding:7px;
-        gap:7px;
-    }
-
-    .topbar{
-        height:48px;
-        min-height:48px;
+@media(max-width:650px) {
+    header {
         padding:0 12px;
     }
 
-    .brand-name{
-        font-size:18px;
+    main {
+        padding:10px;
     }
 
-    .logo{
-        font-size:25px;
+    .layout {
+        grid-template-columns:1fr;
     }
 
-    .main{
-        grid-template-columns:175px minmax(0,1fr) 190px;
-        gap:8px;
+    .camera {
+        min-height:340px;
+        grid-row:1;
     }
 
-    .dpad{
-        max-width:150px;
-        gap:5px;
+    .left,
+    .right {
+        grid-column:auto;
     }
 
-    .dpad button{
-        border-radius:10px;
+    .actions {
+        grid-template-columns:1fr 1fr;
     }
 
-    .arrow{
-        font-size:21px;
+    .dir {
+        width:64px;
+        height:58px;
     }
 
-    .speed-panel{
-        padding:8px;
-    }
-
-    .action-panel{
-        padding:8px;
-    }
-
-    .action-grid{
-        gap:5px;
-    }
-
-    .action-icon{
-        font-size:19px;
-    }
-
-    .action-name{
-        font-size:9px;
-    }
-
-    .stop-btn{
-        min-height:48px;
-        font-size:16px;
-    }
-
-    .servo-btn{
-        min-height:40px;
-    }
-
-    .camera-header{
-        height:34px;
-        min-height:34px;
-    }
-
-    .camera-footer{
-        height:25px;
-        min-height:25px;
+    .panel {
+        padding:14px;
     }
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<header>
+    <div class="brand">
+        <div class="logo">🕷</div>
+        <div>
+            SPIDERBOT
+            <div class="sub">CONTROL STATION</div>
+        </div>
+    </div>
 
-    <!-- ================= HEADER ================= -->
+    <button class="connect" id="connectBtn" onclick="checkConnection()">
+        Connect
+    </button>
+</header>
 
-    <header class="topbar">
+<main>
+<div class="layout">
 
-        <div class="brand">
-            <div class="logo">🕷</div>
+<!-- MOVEMENT PANEL -->
+<section class="panel left">
 
-            <div>
-                <div class="brand-name">SPIDER<span>BOT</span></div>
-                <div class="brand-sub">WIRELESS CONTROL SYSTEM</div>
-            </div>
+    <h3 class="panel-title">MOVEMENT</h3>
+
+    <div class="movement">
+
+        <div class="padrow">
+            <button class="dir"
+                aria-label="Forward"
+                onpointerdown="startMove('forward',event)"
+                onpointerup="stopMove()"
+                onpointercancel="stopMove()"
+                onlostpointercapture="stopMove()">
+                ▲
+            </button>
         </div>
 
-        <div class="top-right">
-
-            <div class="connection">
-                <span class="dot" id="connectionDot"></span>
-                <span id="connectionText">Disconnected</span>
-            </div>
-
-            <button class="connect-btn" id="connectBtn">
-                CONNECT
+        <div class="padrow">
+            <button class="dir"
+                aria-label="Left"
+                onpointerdown="startMove('left',event)"
+                onpointerup="stopMove()"
+                onpointercancel="stopMove()"
+                onlostpointercapture="stopMove()">
+                ◀
             </button>
 
-            <button class="icon-btn" id="settingsBtn" title="Settings">
-                ⚙
-            </button>
+            <div class="empty"></div>
 
+            <button class="dir"
+                aria-label="Right"
+                onpointerdown="startMove('right',event)"
+                onpointerup="stopMove()"
+                onpointercancel="stopMove()"
+                onlostpointercapture="stopMove()">
+                ▶
+            </button>
         </div>
 
-    </header>
-
-    <!-- ================= MAIN CONTENT ================= -->
-
-    <main class="main">
-
-        <!-- LEFT: MOVEMENT + SPEED -->
-
-        <section class="left-panel">
-
-            <div class="panel movement-panel">
-
-                <div class="panel-title">MOVEMENT CONTROL</div>
-
-                <div class="dpad">
-
-                    <button class="empty"></button>
-
-                    <button class="direction forward" data-move="forward">
-                        <span class="arrow">↑</span>
-                        <span class="direction-label">FORWARD</span>
-                    </button>
-
-                    <button class="empty"></button>
-
-                    <button class="direction left" data-move="left">
-                        <span class="arrow">←</span>
-                        <span class="direction-label">LEFT</span>
-                    </button>
-
-                    <button class="empty"></button>
-
-                    <button class="direction right" data-move="right">
-                        <span class="arrow">→</span>
-                        <span class="direction-label">RIGHT</span>
-                    </button>
-
-                    <button class="empty"></button>
-
-                    <button class="direction backward" data-move="backward">
-                        <span class="arrow">↓</span>
-                        <span class="direction-label">BACKWARD</span>
-                    </button>
-
-                    <button class="empty"></button>
-
-                </div>
-
-            </div>
-
-            <!-- SPEED CONTROL -->
-
-            <div class="panel speed-panel">
-
-                <div class="speed-heading">
-                    <span>⚡ SPEED</span>
-                    <span class="speed-number" id="speedValue">50%</span>
-                </div>
-
-                <input
-                    type="range"
-                    class="speed-slider"
-                    id="speedSlider"
-                    min="0"
-                    max="100"
-            step="5"
-                    value="50"
-                >
-
-                <div class="speed-labels">
-                    <span>SLOW</span>
-                    <span>FAST</span>
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- CENTER: CAMERA -->
-
-        <section class="camera-panel">
-
-            <div class="camera-header">
-
-                <div class="camera-title">
-                    <span style="color:var(--red)">◉</span>
-                    CAMERA FEED
-                </div>
-
-                <div class="live-indicator">
-                    <span class="live-dot"></span>
-                    <span id="cameraStatus">CAMERA OFFLINE</span>
-                </div>
-
-            </div>
-
-            <div class="camera-body" id="cameraBody">
-
-                <div class="camera-grid"></div>
-
-                <div class="camera-placeholder" id="cameraPlaceholder">
-
-                    <div class="camera-icon">▣</div>
-
-                    <h3>SPIDERBOT VISION</h3>
-
-                    <p>CAMERA STREAM WILL APPEAR HERE</p>
-
-                </div>
-
-                <!--
-                    ESP32-CAM STREAM WILL BE ADDED HERE LATER.
-
-                    Example future implementation:
-
-                    <img id="cameraStream"
-                         src="http://CAMERA_IP:81/stream">
-
-                -->
-
-            </div>
-
-            <div class="camera-footer">
-
-                <span>SPIDERBOT · VISION SYSTEM</span>
-
-                <span>STREAM : --</span>
-
-            </div>
-
-        </section>
-
-        <!-- RIGHT: ACTIONS -->
-
-        <section class="right-panel">
-
-            <div class="panel action-panel">
-
-                <div class="panel-title action-title">
-                    ROBOT ACTIONS
-                </div>
-
-                <div class="action-grid">
-
-                    <button class="action-btn" data-action="stand">
-                        <span class="action-icon">♙</span>
-                        <span class="action-name">STAND</span>
-                    </button>
-
-                    <button class="action-btn" data-action="sit">
-                        <span class="action-icon">♟</span>
-                        <span class="action-name">SIT</span>
-                    </button>
-
-                    <button class="action-btn" data-action="wave">
-                        <span class="action-icon">👋</span>
-                        <span class="action-name">WAVE</span>
-                    </button>
-
-                    <button class="action-btn" data-action="shake">
-                        <span class="action-icon">🤝</span>
-                        <span class="action-name">SHAKE</span>
-                    </button>
-
-                    <button class="action-btn" data-action="dance">
-                        <span class="action-icon">♫</span>
-                        <span class="action-name">DANCE</span>
-                    </button>
-
-                    <button class="action-btn" data-action="reset">
-                        <span class="action-icon">⟳</span>
-                        <span class="action-name">RESET</span>
-                    </button>
-
-                </div>
-
-            </div>
-
-            <!-- ALL SERVO -->
-
-            <button class="servo-btn" id="servo90Btn">
-                ⟳ &nbsp; ALL SERVOS 90°
+        <div class="padrow">
+            <button class="dir"
+                aria-label="Backward"
+                onpointerdown="startMove('backward',event)"
+                onpointerup="stopMove()"
+                onpointercancel="stopMove()"
+                onlostpointercapture="stopMove()">
+                ▼
             </button>
-
-            <!-- EMERGENCY STOP -->
-
-            <button class="stop-btn" id="stopBtn">
-                ■ &nbsp; STOP
-            </button>
-
-        </section>
-
-    </main>
-
-</div>
-
-<!-- ================= SETTINGS MODAL ================= -->
-
-<div class="modal" id="settingsModal">
-
-    <div class="modal-box">
-
-        <div class="modal-title">
-            ⚙ CONNECTION SETTINGS
-        </div>
-
-        <label class="config-label">
-            Robot ESP32 IP Address
-        </label>
-
-        <input
-            class="config-input"
-            id="robotIP"
-            type="text"
-            placeholder="http://192.168.4.1"
-        >
-
-        <label class="config-label">
-            ESP32-CAM Stream URL (Later)
-        </label>
-
-        <input
-            class="config-input"
-            id="cameraURL"
-            type="text"
-            placeholder="Camera connection will be added later"
-            disabled
-        >
-
-        <div class="modal-buttons">
-
-            <button id="closeSettingsBtn">
-                CLOSE
-            </button>
-
-            <button class="save-btn" id="saveSettingsBtn">
-                SAVE
-            </button>
-
         </div>
 
     </div>
 
+    <!-- SPEED CONTROL -->
+    <div class="speedbox">
+
+        <div class="speedhead">
+            <span>Movement Speed</span>
+            <strong id="speedValue">50%</strong>
+        </div>
+
+        <input
+            id="speedSlider"
+            type="range"
+            min="1"
+            max="100"
+            value="50"
+            oninput="setSpeed(this.value)">
+
+        <div class="speedticks">
+            <span>Slow</span>
+            <span>Fast</span>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- CAMERA PANEL -->
+<section class="panel camera">
+
+    <div class="camhead">
+
+        <h3 class="panel-title" style="margin:0">
+            CAMERA FEED
+        </h3>
+
+        <span class="livebadge">
+            <i class="dot" id="liveDot"></i>
+            <span id="liveText">NOT CONNECTED</span>
+        </span>
+
+    </div>
+
+    <div class="screen">
+
+        <img id="camImage" alt="SpiderBot camera stream">
+
+        <div class="placeholder" id="camPlaceholder">
+            <div class="camicon">▣</div>
+            <p>Camera feed unavailable</p>
+            <p>ESP32-CAM stream URL can be added in Settings</p>
+        </div>
+
+    </div>
+
+    <div class="camfoot">
+        <span>ESP32-CAM</span>
+        <span id="camStatus">Waiting for camera</span>
+    </div>
+
+</section>
+
+<!-- ACTION PANEL -->
+<section class="panel right">
+
+    <h3 class="panel-title">ROBOT ACTIONS</h3>
+
+    <div class="actions">
+
+        <button class="action" onclick="sendAction('stand')">
+            <span class="emoji">🧍</span>
+            Stand
+        </button>
+
+        <button class="action" onclick="sendAction('sit')">
+            <span class="emoji">🪑</span>
+            Sit
+        </button>
+
+        <button class="action" onclick="sendAction('wave')">
+            <span class="emoji">👋</span>
+            Wave
+        </button>
+
+        <button class="action" onclick="sendAction('shake')">
+            <span class="emoji">🤝</span>
+            Shake
+        </button>
+
+        <button class="action" onclick="sendAction('dance')">
+            <span class="emoji">💃</span>
+            Dance
+        </button>
+
+        <button class="action" onclick="sendAction('reset')">
+            <span class="emoji">🔄</span>
+            Reset
+        </button>
+
+    </div>
+
+    <button class="servo" onclick="sendServo90()">
+        ⚙ All Servos → 90°
+    </button>
+
+    <button class="stop" onclick="emergencyStop()">
+        ■ STOP
+        <small>EMERGENCY STOP</small>
+    </button>
+
+    <div class="statusline" id="status">
+        Controller ready · Robot not connected
+    </div>
+
+</section>
+
+</div>
+</main>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
+
+    <div class="modalbox">
+
+        <h2>Connection Settings</h2>
+
+        <div class="field">
+            <label>Robot ESP32 IP / API Base URL</label>
+
+            <input
+                id="robotIP"
+                value="http://192.168.4.1"
+                placeholder="http://192.168.4.1">
+        </div>
+
+        <div class="field">
+            <label>ESP32-CAM Stream URL</label>
+
+            <input
+                id="cameraURL"
+                placeholder="Add camera stream URL later">
+
+            <small>Leave blank for now if ESP32-CAM is not available.</small>
+        </div>
+
+        <div class="modalbuttons">
+            <button onclick="closeSettings()">Cancel</button>
+            <button class="save" onclick="saveSettings()">Save</button>
+        </div>
+
+    </div>
 </div>
 
 <script>
 
-/* =====================================================
-   SPIDERBOT WI-FI CONTROLLER
+let ROBOT_IP = 'http://192.168.4.1';
+let CAMERA_URL = '';
+let activeMoveDirection = null;
 
-   Robot ESP32:
-   Wi-Fi HTTP API
-
-   ESP32-CAM:
-   Camera stream will be added later
-
-   BLE IS NOT USED
-===================================================== */
-
-
-/* ================= CONFIGURATION ================= */
-
-let ROBOT_IP = "http://192.168.4.1";
-
-/*
-    Placeholder API endpoints.
-
-    These are not final firmware endpoints.
-    They must match your ESP32 code later.
-*/
-
-const API = {
-    move:   "/move",
-    action: "/action",
-    speed:  "/speed",
-    stop:   "/stop",
-    servo:  "/servo"
-};
-
-
-/* ================= ELEMENTS ================= */
-
-const connectionDot  = document.getElementById("connectionDot");
-const connectionText = document.getElementById("connectionText");
-const connectBtn     = document.getElementById("connectBtn");
-
-const speedSlider   = document.getElementById("speedSlider");
-const speedValue    = document.getElementById("speedValue");
-
-const settingsModal = document.getElementById("settingsModal");
-const robotIPInput = document.getElementById("robotIP");
-
-
-/* ================= CONNECTION STATUS ================= */
-
-let connected = false;
-
-function setConnectionStatus(isConnected, message){
-
-    connected = isConnected;
-
-    connectionDot.classList.toggle("connected", isConnected);
-
-    connectionText.textContent = message;
-
-    connectBtn.textContent = isConnected ? "CONNECTED" : "CONNECT";
+// STATUS MESSAGE
+function status(t) {
+    document.getElementById('status').textContent = t;
 }
 
+// OPEN SETTINGS
+function openSettings() {
+    document.getElementById('robotIP').value = ROBOT_IP;
+    document.getElementById('cameraURL').value = CAMERA_URL;
+    document.getElementById('settingsModal').classList.add('open');
+}
 
-/* ================= HTTP REQUEST ================= */
+// CLOSE SETTINGS
+function closeSettings() {
+    document.getElementById('settingsModal').classList.remove('open');
+}
 
-/*
-    Send HTTP requests to the robot ESP32.
+// SAVE SETTINGS
+function saveSettings() {
+    ROBOT_IP = document.getElementById('robotIP')
+        .value.trim().replace(/\/$/,'');
 
-    API format will be adjusted according to
-    the final ESP32 firmware.
-*/
+    CAMERA_URL = document.getElementById('cameraURL')
+        .value.trim();
 
-async function sendRequest(endpoint, parameters = {}){
+    setCamera();
+    closeSettings();
+    status('Settings saved');
+}
 
-    if(!ROBOT_IP){
-        console.warn("Robot IP is not configured.");
-        return;
-    }
-
-    const query = new URLSearchParams(parameters).toString();
-
-    const url = ROBOT_IP + endpoint +
-                (query ? "?" + query : "");
-
-    try{
-
-        const response = await fetch(url,{
-            method:"GET",
-            mode:"cors"
+// HTTP API REQUEST
+async function api(path) {
+    try {
+        const response = await fetch(ROBOT_IP + path, {
+            mode:'cors',
+            signal:AbortSignal.timeout(3000)
         });
 
-        if(!response.ok){
-            throw new Error("HTTP " + response.status);
-        }
+        if (!response.ok)
+            throw Error('HTTP ' + response.status);
 
-        console.log("Command sent:",url);
+        return await response.text();
 
-    }catch(error){
-
-        console.error("Communication error:",error);
-
-        setConnectionStatus(false,"Connection error");
-
+    } catch(e) {
+        status('Command failed · check Wi-Fi / ESP32 API');
+        console.warn(e);
+        return null;
     }
-
 }
 
+// CHECK CONNECTION
+async function checkConnection() {
 
-/* ================= CONNECT ================= */
+    const b = document.getElementById('connectBtn');
 
-/*
-    Simple Wi-Fi API connection test.
+    b.textContent = 'Checking…';
 
-    ESP32 firmware must provide a suitable test endpoint.
-    Currently /status is assumed as a placeholder.
-*/
+    const result = await api('/status');
 
-async function connectRobot(){
+    if (result !== null) {
 
-    connectBtn.textContent = "CONNECTING...";
+        b.textContent = 'Connected';
+        b.classList.add('connected');
+        status('Robot connected');
 
-    try{
+    } else {
 
-        const response = await fetch(
-            ROBOT_IP + "/status",
-            {
-                method:"GET",
-                mode:"cors",
-                signal:AbortSignal.timeout(3000)
-            }
-        );
-
-        if(response.ok){
-
-            setConnectionStatus(true,"Connected");
-
-        }else{
-
-            setConnectionStatus(false,"Connection failed");
-
-        }
-
-    }catch(error){
-
-        setConnectionStatus(false,"Disconnected");
-
-        console.warn("Robot connection failed:",error);
+        b.textContent = 'Connect';
+        b.classList.remove('connected');
+        status('Unable to connect to robot');
 
     }
-
 }
 
+// CONTINUOUS MOVEMENT
+function startMove(direction,event) {
 
-/* ================= MOVEMENT ================= */
-
-const movementButtons =
-    document.querySelectorAll("[data-move]");
-
-let currentMovement = null;
-
-
-/*
-    Movement works while holding a button.
-
-    Press  -> Send movement command
-    Release -> Send STOP
-*/
-
-function startMovement(button){
-
-    if(!connected){
-        console.warn("Robot is not connected.");
-        return;
-    }
-
-    if(currentMovement === button.dataset.move){
-        return;
-    }
-
-    stopMovement(false);
-
-    currentMovement = button.dataset.move;
-
-    button.classList.add("active");
-
-    sendRequest(API.move,{
-        direction:currentMovement,
-        speed:speedSlider.value
-    });
-
-}
-
-
-function stopMovement(sendStopCommand = true){
-
-    if(currentMovement === null){
-        return;
-    }
-
-    currentMovement = null;
-
-    document.querySelectorAll("[data-move]")
-        .forEach(button=>{
-            button.classList.remove("active");
-        });
-
-    if(sendStopCommand){
-        sendStop();
-    }
-
-}
-
-
-/* ================= MOVEMENT BUTTON EVENTS ================= */
-
-movementButtons.forEach(button=>{
-
-    button.addEventListener("pointerdown",event=>{
-
+    if (event) {
         event.preventDefault();
 
-        button.setPointerCapture?.(event.pointerId);
+        try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+        } catch(e) {}
+    }
 
-        startMovement(button);
+    // Prevent duplicate requests for the same direction
+    if (activeMoveDirection === direction)
+        return;
 
-    });
+    // Stop previous direction before starting a new one
+    if (activeMoveDirection)
+        api('/stop');
 
-    button.addEventListener("pointerup",event=>{
+    activeMoveDirection = direction;
 
-        event.preventDefault();
+    api('/move?direction=' + encodeURIComponent(direction));
 
-        stopMovement();
-
-    });
-
-    button.addEventListener("pointercancel",()=>{
-        stopMovement();
-    });
-
-    button.addEventListener("lostpointercapture",()=>{
-        stopMovement();
-    });
-
-    button.addEventListener("contextmenu",event=>{
-        event.preventDefault();
-    });
-
-});
-
-
-/* ================= STOP ================= */
-
-function sendStop(){
-
-    currentMovement = null;
-
-    document.querySelectorAll("[data-move]")
-        .forEach(button=>{
-            button.classList.remove("active");
-        });
-
-    sendRequest(API.stop);
-
+    status('Moving ' + direction);
 }
 
-document.getElementById("stopBtn")
-    .addEventListener("click",sendStop);
+// RELEASE = STOP
+function stopMove() {
 
+    if (activeMoveDirection !== null) {
 
-/* ================= SPEED ================= */
+        activeMoveDirection = null;
 
-speedSlider.addEventListener("input",()=>{
+        api('/stop');
 
-    const value = Number(speedSlider.value);
-
-    speedValue.textContent = value + "%";
-
-});
-
-speedSlider.addEventListener("change",()=>{
-
-    if(!connected){
-        return;
+        status('Movement stopped');
     }
+}
 
-    sendRequest(API.speed,{
-        value:speedSlider.value
-    });
+// ACTION BUTTONS
+function sendAction(action) {
 
-});
+    api('/action?name=' + encodeURIComponent(action));
 
+    status('Action: ' + action);
+}
 
-/* ================= ROBOT ACTIONS ================= */
+// SPEED CONTROL
+function setSpeed(value) {
 
-document.querySelectorAll("[data-action]")
-    .forEach(button=>{
+    document.getElementById('speedValue').textContent = value + '%';
 
-        button.addEventListener("click",()=>{
+    api('/speed?value=' + value);
+}
 
-            if(!connected){
-                console.warn("Robot is not connected.");
-                return;
-            }
+// SERVO 90
+function sendServo90() {
 
-            const action = button.dataset.action;
+    api('/servo?angle=90');
 
-            stopMovement(false);
+    status('All servos → 90°');
+}
 
-            sendRequest(API.action,{
-                name:action
-            });
+// EMERGENCY STOP
+function emergencyStop() {
 
-        });
+    activeMoveDirection = null;
 
-    });
+    api('/stop');
 
+    status('EMERGENCY STOP sent');
+}
 
-/* ================= ALL SERVOS 90° ================= */
+// CAMERA
+function setCamera() {
 
-document.getElementById("servo90Btn")
-    .addEventListener("click",()=>{
+    const img = document.getElementById('camImage');
+    const placeholder = document.getElementById('camPlaceholder');
+    const dot = document.getElementById('liveDot');
+    const txt = document.getElementById('liveText');
 
-        if(!connected){
-            console.warn("Robot is not connected.");
-            return;
-        }
+    if (CAMERA_URL) {
 
-        stopMovement(false);
+        img.src = CAMERA_URL;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
 
-        sendRequest(API.servo,{
-            angle:90
-        });
+        txt.textContent = 'STREAM SET';
+        dot.style.background = '#36c98a';
 
-    });
+        document.getElementById('camStatus')
+            .textContent = 'Stream URL configured';
 
+        img.onerror = () => {
 
-/* ================= CONNECT BUTTON ================= */
+            img.style.display = 'none';
+            placeholder.style.display = 'block';
 
-connectBtn.addEventListener("click",connectRobot);
+            txt.textContent = 'STREAM ERROR';
+            dot.style.background = '#ef4444';
 
+            document.getElementById('camStatus')
+                .textContent = 'Could not load stream';
+        };
 
-/* ================= SETTINGS ================= */
+    } else {
 
-document.getElementById("settingsBtn")
-    .addEventListener("click",()=>{
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
 
-        robotIPInput.value = ROBOT_IP;
+        txt.textContent = 'NOT CONNECTED';
+        dot.style.background = '#59616d';
 
-        settingsModal.classList.add("show");
-
-    });
-
-
-document.getElementById("closeSettingsBtn")
-    .addEventListener("click",()=>{
-
-        settingsModal.classList.remove("show");
-
-    });
-
-
-document.getElementById("saveSettingsBtn")
-    .addEventListener("click",()=>{
-
-        const newIP = robotIPInput.value.trim();
-
-        if(newIP){
-
-            ROBOT_IP = newIP.replace(/\/$/,"");
-
-        }
-
-        settingsModal.classList.remove("show");
-
-        setConnectionStatus(false,"Disconnected");
-
-    });
-
-
-settingsModal.addEventListener("click",event=>{
-
-    if(event.target === settingsModal){
-
-        settingsModal.classList.remove("show");
-
+        document.getElementById('camStatus')
+            .textContent = 'Waiting for camera';
     }
+}
 
-});
+// SETTINGS SHORTCUT
+document.querySelector('.brand')
+    .addEventListener('dblclick',openSettings);
 
+document.getElementById('connectBtn')
+    .addEventListener('contextmenu',e => {
+        e.preventDefault();
+        openSettings();
+    });
 
-/* ================= INITIALIZATION ================= */
-
-setConnectionStatus(false,"Disconnected");
-
-console.log("SpiderBot Wi-Fi Controller Initialized");
+setCamera();
 
 </script>
 
