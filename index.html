@@ -822,41 +822,46 @@ function setCamera() {
     const placeholder = document.getElementById('camPlaceholder');
     const dot = document.getElementById('liveDot');
     const txt = document.getElementById('liveText');
+    const camStatus = document.getElementById('camStatus');
 
     if (CAMERA_URL) {
 
-        img.src = CAMERA_URL;
-        img.style.display = 'block';
-        placeholder.style.display = 'none';
+        img.onload = () => {
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
 
-        txt.textContent = 'STREAM SET';
-        dot.style.background = '#36c98a';
-
-        document.getElementById('camStatus')
-            .textContent = 'Stream URL configured';
+            txt.textContent = 'LIVE';
+            dot.style.background = '#36c98a';
+            camStatus.textContent = 'Camera streaming';
+        };
 
         img.onerror = () => {
-
             img.style.display = 'none';
-            placeholder.style.display = 'block';
+            placeholder.style.display = 'flex';
 
             txt.textContent = 'STREAM ERROR';
             dot.style.background = '#ef4444';
-
-            document.getElementById('camStatus')
-                .textContent = 'Could not load stream';
+            camStatus.textContent = 'Stream connection failed';
         };
 
+        img.src = '';
+
+        setTimeout(() => {
+            img.src = CAMERA_URL + '?t=' + Date.now();
+        }, 100);
+
     } else {
+
+        img.onload = null;
+        img.onerror = null;
+        img.src = '';
 
         img.style.display = 'none';
         placeholder.style.display = 'flex';
 
         txt.textContent = 'NOT CONNECTED';
         dot.style.background = '#59616d';
-
-        document.getElementById('camStatus')
-            .textContent = 'Waiting for camera';
+        camStatus.textContent = 'Waiting for camera';
     }
 }
 
